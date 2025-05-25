@@ -2,13 +2,8 @@ from flask import Flask, request
 import requests
 import telebot
 import json
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium import webdriver
+
 import os
 
 TOKEN_TELEGRAM = "7521495978:AAEBkQrgh9Z2i2SBzfm_915QKmrzwt51Rrc"
