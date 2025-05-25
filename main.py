@@ -6,7 +6,10 @@ from bs4 import BeautifulSoup
 
 import os
 
-TOKEN_TELEGRAM = "7521495978:AAEBkQrgh9Z2i2SBzfm_915QKmrzwt51Rrc"
+TOKEN_TELEGRAM = os.environ.get("TOKEN_TELEGRAM")
+
+webhook_activado = False
+
 bot = telebot.TeleBot(TOKEN_TELEGRAM)
 
 app = Flask(__name__)
@@ -72,16 +75,20 @@ def webhook():
     bot.process_new_updates([update])
     return "¡OK!", 200
 
-
-@app.before_first_request
-def activar_webhook():
-    render_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-    if render_hostname:
-        url_webhook = f"https://{render_hostname}/{TOKEN_TELEGRAM}"
-        bot.remove_webhook()
-        bot.set_webhook(url=url_webhook)
-    else:
-        print("RENDER_EXTERNAL_HOSTNAME no esta definido ")
+@app.after_request
+def activar_webhook(response):
+    global webhook_activado
+    if not webhook_activado:
+        render_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+        if render_hostname:
+            url_webhook = f"https://{render_hostname}/{TOKEN_TELEGRAM}"
+            bot.remove_webhook()
+            bot.set_webhook(url=url_webhook)
+            print(f"✅ Webhook activado: {url_webhook}")
+            webhook_activado = True
+        else:
+            print("⚠️ RENDER_EXTERNAL_HOSTNAME no está definido.")
+    return response
 
 
 if __name__ == "__main__":
